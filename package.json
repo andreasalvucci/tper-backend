@@ -1,0 +1,24 @@
+{
+    "name": "tper-backend",
+    "version": "1.0.0",
+    "description": "Returns a JSON list of the buses for a certain bus stop",
+    "main": "server.js",
+    "scripts": {
+        "test": "nodemon server.js",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/andreasalvucci/tper-realtime.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/andreasalvucci/tper-realtime/issues"
+    },
+    "homepage": "https://github.com/andreasalvucci/tper-realtime#readme",
+    "devDependencies": {
+        "fast-xml-parser": "^4.0.11",
+        "nodemon": "^2.0.20"
+    }
+}
