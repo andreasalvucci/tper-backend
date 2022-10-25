@@ -10,3 +10,28 @@ A simple API server that gives information about the next buses arriving at a ce
 2. In the main directory just enter
     `docker-compose up --build `
 
+## Get the buses for a given bus stop
+### Request
+`GET fermata/idFermata `
+
+### Response
+a JSON object like this
+
+```json
+{"message":
+
+{"Autobus":
+[
+
+    {"Line":"39","Time":"11:35","Satellite":true},
+    {"Line":"33","Time":"11:36","Satellite":true}
+
+    ]
+    }
+    }
+
+```
+
+
+
+

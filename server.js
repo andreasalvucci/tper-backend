@@ -11,9 +11,9 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-app.get('/fermata', async(req, res) => {
-    fermata = req.query.fermata
-    linea = req.query.linea
+app.get('/fermata/:fermata', async(req, res) => {
+    fermata = req.params.fermata
+        //linea = req.query.linea
 
     listaAutobus = await callTPerAPI(fermata)
     console.log(listaAutobus)
