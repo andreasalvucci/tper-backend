@@ -16,8 +16,11 @@ app.get('/fermata', (req, res) => {
     linea = req.query.linea
     hour = date.getHours().toString()
     minute = date.getMinutes().toString()
+    if (minute.length == 1) {
+        minute = "0" + minute
+    }
     ora = hour + minute
-    console.log("Richiesta la fermata: " + fermata)
+    console.log("Richiesta la fermata: " + fermata + " per le ore " + ora)
     if (fermata == "") {
         return res.status(500).json({ message: "Fermata is null" });
     }
@@ -40,17 +43,9 @@ app.get('/fermata', (req, res) => {
             var body = Buffer.concat(bodyChunks);
             console.log('BODY: ' + body);
             output = parser.parse(body).string.toString()
-            listaAutobus = {}
-            key = "Autobus"
-            listaAutobus[key] = []
 
+            listaAutobus = getJsonList(output)
 
-            lista = output.split(',')
-
-            lista.forEach(function(autobus) {
-                console.log(autobus)
-                listaAutobus["Autobus"].push(autobus)
-            })
 
             res.json({ message: listaAutobus })
         })
@@ -64,3 +59,31 @@ app.get('/fermata', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+function cleanBus(toAdd) {
+    const regex = /\([^)]*\)/;
+    toAdd = toAdd.replace("TperHellobus:", "")
+    toAdd = toAdd.replace(regex, "")
+    toAdd = toAdd.trimStart()
+    toAdd = toAdd.trimEnd()
+    return toAdd
+
+}
+
+function getJsonList(output) {
+    listaAutobus = {}
+    key = "Autobus"
+    listaAutobus[key] = []
+
+
+    lista = output.split(',')
+
+    lista.forEach(function(autobus) {
+        busToAdd = cleanBus(autobus)
+        listaAutobus["Autobus"].push(busToAdd)
+    })
+
+    return listaAutobus
+
+
+}
