@@ -11,9 +11,77 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-app.get('/fermata', (req, res) => {
+app.get('/fermata', async(req, res) => {
     fermata = req.query.fermata
     linea = req.query.linea
+
+    callTPerAPI(fermata).then((listaAutobus) => {
+        console.log(listaAutobus)
+    })
+    console.log(listaAutobus)
+
+    res.json({ message: listaAutobus })
+
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+
+function cleanBus(toAdd) {
+    const regex = /\([^)]*\)/;
+    toAdd = toAdd.replace("TperHellobus:", "")
+    toAdd = toAdd.replace(regex, "")
+    toAdd = toAdd.trimStart()
+    toAdd = toAdd.trimEnd()
+    return toAdd
+
+}
+
+function getJsonList(output) {
+    listaAutobus = {}
+    key = "Autobus"
+    listaAutobus[key] = []
+
+    lista = output.split(',')
+
+    lista.forEach(function(autobus) {
+        bus = {}
+        busToAdd = cleanBus(autobus)
+        lineNumber = getLineNumber(busToAdd)
+        busTime = getBusTime(busToAdd)
+        satellite = getSatellite(busToAdd)
+        console.log("LINEA " + lineNumber)
+        console.log("ORE: " + busTime)
+        console.log("SATELLITE: " + satellite)
+        bus["Line"] = lineNumber
+        bus["Time"] = busTime
+        bus["Satellite"] = satellite
+        listaAutobus["Autobus"].push(bus)
+    })
+
+    return listaAutobus
+}
+
+function getLineNumber(aBusMessage) {
+    info = aBusMessage.split(" ")
+    return info[0]
+
+}
+
+function getBusTime(aBusMessage) {
+    info = aBusMessage.split(" ")
+    return info[2]
+}
+
+function getSatellite(aBusMessage) {
+    info = aBusMessage.split(" ")
+    if (info == "Previsto") {
+        return false
+    } else return true
+}
+
+async function callTPerAPI(fermata) {
     hour = date.getHours().toString()
     minute = date.getMinutes().toString()
     if (minute.length == 1) {
@@ -45,45 +113,16 @@ app.get('/fermata', (req, res) => {
             output = parser.parse(body).string.toString()
 
             listaAutobus = getJsonList(output)
+            return listaAutobus;
 
 
-            res.json({ message: listaAutobus })
+
         })
     });
 
     req1.on('error', function(e) {
         console.log('ERROR: ' + e.message);
     });
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
-
-function cleanBus(toAdd) {
-    const regex = /\([^)]*\)/;
-    toAdd = toAdd.replace("TperHellobus:", "")
-    toAdd = toAdd.replace(regex, "")
-    toAdd = toAdd.trimStart()
-    toAdd = toAdd.trimEnd()
-    return toAdd
-
-}
-
-function getJsonList(output) {
-    listaAutobus = {}
-    key = "Autobus"
-    listaAutobus[key] = []
-
-
-    lista = output.split(',')
-
-    lista.forEach(function(autobus) {
-        busToAdd = cleanBus(autobus)
-        listaAutobus["Autobus"].push(busToAdd)
-    })
-
-    return listaAutobus
 
 
 }
