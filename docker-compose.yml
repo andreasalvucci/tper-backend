@@ -1,6 +1,6 @@
 version: "3"
 services:
-  node-express-docker:
+  tper-backend:
     environment:
       - NODE_ENV=development
     build:
