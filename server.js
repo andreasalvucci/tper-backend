@@ -15,9 +15,7 @@ app.get('/fermata', async(req, res) => {
     fermata = req.query.fermata
     linea = req.query.linea
 
-    callTPerAPI(fermata).then((listaAutobus) => {
-        console.log(listaAutobus)
-    })
+    listaAutobus = await callTPerAPI(fermata)
     console.log(listaAutobus)
 
     res.json({ message: listaAutobus })
@@ -82,47 +80,53 @@ function getSatellite(aBusMessage) {
 }
 
 async function callTPerAPI(fermata) {
-    hour = date.getHours().toString()
-    minute = date.getMinutes().toString()
-    if (minute.length == 1) {
-        minute = "0" + minute
-    }
-    ora = hour + minute
-    console.log("Richiesta la fermata: " + fermata + " per le ore " + ora)
-    if (fermata == "") {
-        return res.status(500).json({ message: "Fermata is null" });
-    }
+
+    return new Promise(function(resolve, reject) {
+        hour = date.getHours().toString()
+        minute = date.getMinutes().toString()
+        if (minute.length == 1) {
+            minute = "0" + minute
+        }
+        ora = hour + minute
+        console.log("Richiesta la fermata: " + fermata + " per le ore " + ora)
+        if (fermata == "") {
+            return res.status(500).json({ message: "Fermata is null" });
+        }
 
 
-    var options = {
-        host: 'hellobuswsweb.tper.it',
-        path: '/web-services/hello-bus.asmx/QueryHellobus?fermata=' + fermata + '&linea=&oraHHMM=' + ora
-    };
+        var options = {
+            host: 'hellobuswsweb.tper.it',
+            path: '/web-services/hello-bus.asmx/QueryHellobus?fermata=' + fermata + '&linea=&oraHHMM=' + ora
+        };
 
-    myOutput = ""
-    body = ""
-    var req1 = https.get(options, function(res1) {
-        // Buffer the body entirely for processing as a whole.
-        var bodyChunks = [];
-        res1.on('data', function(chunk) {
-            // You can process streamed parts here...
-            bodyChunks.push(chunk);
-        }).on('end', function() {
-            var body = Buffer.concat(bodyChunks);
-            console.log('BODY: ' + body);
-            output = parser.parse(body).string.toString()
+        myOutput = ""
+        body = ""
+        var req1 = https.get(options, function(res1) {
+            // Buffer the body entirely for processing as a whole.
+            var bodyChunks = [];
+            res1.on('data', function(chunk) {
+                // You can process streamed parts here...
+                bodyChunks.push(chunk);
+            }).on('end', function() {
+                var body = Buffer.concat(bodyChunks);
+                console.log('BODY: ' + body);
+                output = parser.parse(body).string.toString()
 
-            listaAutobus = getJsonList(output)
-            return listaAutobus;
+                listaAutobus = getJsonList(output)
+                resolve(listaAutobus);
 
 
 
-        })
-    });
+            })
+        });
 
-    req1.on('error', function(e) {
-        console.log('ERROR: ' + e.message);
-    });
+        req1.on('error', function(e) {
+            console.log('ERROR: ' + e.message);
+            reject(e)
+        });
+
+    })
+
 
 
 }
