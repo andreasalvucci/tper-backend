@@ -1,7 +1,8 @@
 var express = require('express')
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 8000
 var https = require('https')
+const moment = require('moment-timezone')
 
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
 var parser = new XMLParser()
@@ -84,11 +85,12 @@ async function callTPerAPI(fermata) {
 
         var now = moment().tz('Europe/Rome')
         var dst = now.isDST()
-        hour = now.hours()
+        hour = now.hour()
         minute = now.minutes()
+        console.log("RICHIESTA PER LE ORE " + hour + ":" + minute)
 
         if (dst) {
-            minute++
+            hour = hour - 1
         }
         if (minute.length == 1) {
             minute = "0" + minute
@@ -102,7 +104,7 @@ async function callTPerAPI(fermata) {
 
         var options = {
             host: 'hellobuswsweb.tper.it',
-            path: '/web-services/hello-bus.asmx/QueryHellobus?fermata=' + fermata + '&linea=&oraHHMM=' + ora
+            path: '/web-services/hello-bus.asmx/QueryHellobus?fermata=' + fermata + '&linea=&oraHHMM=' // + ora
         };
 
         myOutput = ""
