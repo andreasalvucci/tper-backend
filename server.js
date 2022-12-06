@@ -83,8 +83,13 @@ async function callTPerAPI(fermata) {
     return new Promise(function(resolve, reject) {
 
         var now = moment().tz('Europe/Rome')
+        var dst = now.isDST()
         hour = now.hours()
         minute = now.minutes()
+
+        if (dst) {
+            minute++
+        }
         if (minute.length == 1) {
             minute = "0" + minute
         }
