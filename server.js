@@ -2,7 +2,6 @@ var express = require('express')
 const app = express()
 const port = process.env.PORT
 var https = require('https')
-const date = new Date()
 
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
 var parser = new XMLParser()
@@ -82,8 +81,10 @@ function getSatellite(aBusMessage) {
 async function callTPerAPI(fermata) {
 
     return new Promise(function(resolve, reject) {
-        hour = date.getHours().toString()
-        minute = date.getMinutes().toString()
+
+        var now = moment().tz('Europe/Rome')
+        hour = now.hours()
+        minute = now.minutes()
         if (minute.length == 1) {
             minute = "0" + minute
         }
